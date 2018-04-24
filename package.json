@@ -1,0 +1,22 @@
+{
+  "name": "la-machine-a-histoires",
+  "version": "0.1.0",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "ent": "~0.1.0",
+    "express": "^4.16.3",
+    "knex": "^0.14.6",
+    "mysql": "^2.15.0",
+    "socket.io": "~1.2.1"
+  },
+  "author": "Cygnauh <cygnauh@gmail.com>",
+  "description": "Serveur",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "license": "ISC"
+}
+
+

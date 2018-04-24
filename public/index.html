@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Node database tutorial</title>
+</head>
+<body>
+
+
+<h2>Rechercher un son</h2>
+<form action="/sound" method="post" class="getSound">
+    <input type="text" name="sound" class="sound" autofocus />
+    <input type="submit" id="rechercheSon"/>
+</form>
+<br>
+<form action="/sound" method="post" class="getSounds">
+    <input type="submit" id="son" value="Tous les sons"/>
+</form>
+
+
+
+
+
+<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+<!--<script src="/node_modules/requirejs/require.js"></script>-->
+<!--<script src="app.js"></script>-->
+<script>
+    const getSoundForm = document.querySelector('.getSounds')
+    getSoundForm.addEventListener('submit', (e) => {
+        e.preventDefault()
+        getSound()
+    })
+    function getSound () {
+        return window.fetch('http://localhost:7555/test', {
+            method: "GET",
+            headers: {
+                "Content-Type": "text/plain"
+            }
+        })
+            .then(function(response) {
+                console.log(response)
+            return response;
+        })
+            .then(function(myJson) {
+                console.log(myJson);
+            });
+    }
+
+</script>
+</body>
+</html>
