@@ -27,9 +27,9 @@ app.use(bodyParser.json())
 
 
 // Chargement de la page index.html
-// app.get('/', function (req, res) {
-//     res.sendFile(__dirname + '/public/index.html');
-// });
+app.get('/', function (req, res) {
+    res.sendFile(__dirname + '/public/index.html');
+});
 
 con.connect(function(err) {
     if (err) throw err;
