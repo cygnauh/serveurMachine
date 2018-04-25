@@ -5,7 +5,8 @@ var app = require('express')(),
     io = require('socket.io').listen(server),
     ent = require('ent'), // Permet de bloquer les caractères HTML (sécurité équivalente à htmlentities en PHP)
     bodyParser = require('body-parser'),
-    fs = require('fs');
+    fs = require('fs'),
+    cors = require("express-cors");
 
 const store = require('./store')
 
@@ -24,6 +25,10 @@ app.use(bodyParser.urlencoded({ extended: false }))
 
 // parse application/json
 app.use(bodyParser.json())
+app.use(cors({
+    allowedOrigins :['localhost:*', '127.0.0.1:*','127.0.0.1:8081', '0.0.0.0:*'],
+    headers:['X-Requested-With', 'Content-Type', 'authorization']
+}))
 
 
 // Chargement de la page index.html
@@ -35,8 +40,10 @@ con.connect(function(err) {
     if (err) throw err;
 });
 
-app.get('/sound', function (req, res) {
-    getSound('SELECT * FROM sound', function(err,data){
+// ---- get every sounds
+
+app.get('/sounds', function (req, res) {
+    getHelper('SELECT * FROM sound', function(err,data){
         if (err) {
             // error handling code goes here
             console.log("ERROR : ",err);
@@ -44,36 +51,49 @@ app.get('/sound', function (req, res) {
             // code to execute on data retrieval
             console.log("result from db is : ",data);
             console.log(JSON.stringify(data));
-            res.setHeader('Content-Type', 'application/json');
-            res.send(JSON.stringify(data));
-            res.json(JSON.stringify(data));
-            res.end();
+            res.status(200).json(data);
         }
     });
 });
 
-app.get('/test', function (req, res) {
-            res.end("hello test");
+// ---- get a sound from his name
+
+app.get('/sound', function (req, res) {
+
+    //http://localhost:8080/sound?sound=foret
+
+    var sound_name = req.param('sound');
+
+    getHelper("SELECT * FROM sound WHERE name ='" + sound_name +"'", function(err,data){
+        if (err) {
+            // error handling code goes here
+            console.log("ERROR : ",err);
+        } else {
+            // code to execute on data retrieval
+            console.log("result from db is : ",data);
+            console.log(JSON.stringify(data));
+            res.status(200).json(data);
+        }
+    });
 });
 
 
-// app.get('/sound/:sound', function (req, res) {
-//
-//
-//         con.query("SELECT * FROM sound", function (err, result, fields) {
-//             if (err) throw err;
-//             // console.log("sound : ",req.params.sound.toString());
-//             if(result){
-//                 console.log(result)
-//                 return result
-//             }
-//         });
-//
-//
-//     con.end()
-// });
 
+// ---- get every places
 
+app.get('/places', function (req, res) {
+    getHelper("SELECT * FROM sound WHERE type = 'place' ", function(err,data){
+        if (err) {
+            // error handling code goes here
+            console.log("ERROR : ",err);
+        } else {
+            // code to execute on data retrieval
+            console.log("result from db is : ",data);
+            console.log(JSON.stringify(data));
+            res.status(200).json(data);
+        }
+    });
+});
 
 app.post('/data', function(req, res){
 
@@ -89,25 +109,26 @@ app.post('/data', function(req, res){
     });
 
     res.send(req.body.username)
-
-
     console.log('body: ', req.body)
 });
 
 
-function getSound(query, callback)
+// HELPERS
+
+
+function getHelper(query, callback)
 {
     con.query(query, function(err, result)
     {
         if (err)
             callback(err,null);
         else
-            callback(null,result[0].url);
+            callback(null,result);
     });
 }
 
 
 
-app.listen(7555, () => {
-    console.log('Server running on http://localhost:7555')
+app.listen(8080, () => {
+    console.log('Server running on http://localhost:80')
 })

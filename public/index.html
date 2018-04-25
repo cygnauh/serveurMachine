@@ -6,7 +6,7 @@
 <body>
 
 
-<h2>Rechercher un son</h2>
+<h2>Pourquoi</h2>
 <form action="/sound" method="post" class="getSound">
     <input type="text" name="sound" class="sound" autofocus />
     <input type="submit" id="rechercheSon"/>
@@ -38,7 +38,7 @@
         })
             .then(function(response) {
                 console.log(response)
-            return response;
+            return response.json();
         })
             .then(function(myJson) {
                 console.log(myJson);
