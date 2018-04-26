@@ -21,10 +21,11 @@ var con = mysql.createConnection({
 
 app.use(require('express').static('public'))
 
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({ extended: true }))
 
 // parse application/json
 app.use(bodyParser.json())
+
 app.use(cors({
     allowedOrigins :['localhost:*', '127.0.0.1:*','127.0.0.1:8081', '0.0.0.0:*'],
     headers:['X-Requested-With', 'Content-Type', 'authorization']
@@ -39,6 +40,7 @@ app.get('/', function (req, res) {
 con.connect(function(err) {
     if (err) throw err;
 });
+
 
 // ---- get every sounds
 
@@ -56,7 +58,7 @@ app.get('/sounds', function (req, res) {
     });
 });
 
-// ---- get a sound from his name
+// ---- get a sound from its name
 
 app.get('/sound', function (req, res) {
 
@@ -95,29 +97,38 @@ app.get('/places', function (req, res) {
     });
 });
 
-app.post('/data', function(req, res){
 
-    // var sql = "INSERT INTO customers (name, address) VALUES ('Company Inc', 'Highway 37')";
-    var sql = "INSERT INTO story (title, content) VALUES ('Company Inc', 'Highway 37')";
+// ---- post a story
 
-    con.connect(function(err) {
-        if (err) throw err;
-        con.query(sql, function(err, result){
-            if(err) throw err;
-            console.log("1 record inserted");
+app.post('/createStory', function(req, res){
+    let body = [];
+    req.on('data', (chunk) => {
+        body.push(chunk);
+    }).on('end', () => {
+        body = Buffer.concat(body);
+        let bodyJson = JSON.parse(body)
+        let title=bodyJson.title.toString()
+        let content=bodyJson.content.toString()
+        // at this point, `body` has the entire request body stored in it as a string
+
+        var sql = "INSERT INTO story (title, content) VALUES ('"+title+"', '"+content+"')";
+        getHelper(sql, function(err,data){
+            if (err) {
+                // error handling code goes here
+                console.log("ERROR : ",err);
+            } else {
+                console.log("1 record inserted");
+                res.status(200).json(data);
+            }
         });
     });
-
-    res.send(req.body.username)
-    console.log('body: ', req.body)
 });
 
 
 // HELPERS
 
 
-function getHelper(query, callback)
-{
+function getHelper(query, callback) {
     con.query(query, function(err, result)
     {
         if (err)
@@ -126,8 +137,6 @@ function getHelper(query, callback)
             callback(null,result);
     });
 }
-
-
 
 app.listen(8080, () => {
     console.log('Server running on http://localhost:80')
