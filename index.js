@@ -23,6 +23,8 @@ app.use(require('express').static('public'))
 
 app.use(bodyParser.urlencoded({ extended: true }))
 
+
+
 // parse application/json
 app.use(bodyParser.json())
 
@@ -41,6 +43,33 @@ con.connect(function(err) {
     if (err) throw err;
 });
 
+// ---- post a sound
+
+app.post('/addsound', function(req, res){
+    let body = [];
+    req.on('data', (chunk) => {
+        body.push(chunk);
+    }).on('end', () => {
+        body = Buffer.concat(body);
+        let bodyJson = JSON.parse(body)
+        let name=bodyJson.name.toString()
+        let url=bodyJson.url.toString()
+        let type=bodyJson.type.toString()
+        // at this point, `body` has the entire request body stored in it as a string
+
+        var sql = "INSERT INTO sound (name, url, type) VALUES ('"+name+"', '"+url+"','"+type+"')";
+        getHelper(sql, function(err,data){
+            if (err) {
+                // error handling code goes here
+                console.log("ERROR : ",err);
+            } else {
+                console.log("1 record inserted");
+                res.status(200).json(data);
+            }
+        });
+    });
+});
+
 
 // ---- get every sounds
 
@@ -51,8 +80,8 @@ app.get('/sounds', function (req, res) {
             console.log("ERROR : ",err);
         } else {
             // code to execute on data retrieval
-            console.log("result from db is : ",data);
-            console.log(JSON.stringify(data));
+            // console.log("result from db is : ",data);
+            // console.log(JSON.stringify(data));
             res.status(200).json(data);
         }
     });
@@ -72,8 +101,8 @@ app.get('/sound', function (req, res) {
             console.log("ERROR : ",err);
         } else {
             // code to execute on data retrieval
-            console.log("result from db is : ",data);
-            console.log(JSON.stringify(data));
+            // console.log("result from db is : ",data);
+            // console.log(JSON.stringify(data));
             res.status(200).json(data);
         }
     });
@@ -90,11 +119,43 @@ app.get('/places', function (req, res) {
             console.log("ERROR : ",err);
         } else {
             // code to execute on data retrieval
-            console.log("result from db is : ",data);
-            console.log(JSON.stringify(data));
+            // console.log("result from db is : ",data);
+            // console.log(JSON.stringify(data));
             res.status(200).json(data);
         }
     });
+});
+
+
+// ---- delete sound
+
+app.delete('/deletesounds', function (req, res) {
+
+        let body = [];
+        req.on('data', (chunk) => {
+            body.push(chunk);
+        }).on('end', () => {
+            body = Buffer.concat(body);
+            let bodyJson = JSON.parse(body)
+            // at this point, `body` has the entire request body stored in it as a string
+
+            console.log(bodyJson.names)
+            console.log(bodyJson.names.length)
+
+            for(var i = 0 ; i<bodyJson.names.length; i++){
+                var sql = "DELETE FROM sound WHERE name ='"+bodyJson.names[i]+"'" ;
+                console.log(sql, 'sql')
+                getHelper(sql, function(err,data){
+                    if (err) {
+                        // error handling code goes here
+                        console.log("ERROR : ",err);
+                    } else {
+                        console.log("1 record inserted");
+                        res.status(200).write(bodyJson[i]+ "delete");
+                    }
+                });
+            }
+        });
 });
 
 
@@ -121,6 +182,22 @@ app.post('/createStory', function(req, res){
                 res.status(200).json(data);
             }
         });
+    });
+});
+
+// ---- get every stories
+
+app.get('/sounds', function (req, res) {
+    getHelper('SELECT * FROM story', function(err,data){
+        if (err) {
+            // error handling code goes here
+            console.log("ERROR : ",err);
+        } else {
+            // code to execute on data retrieval
+            // console.log("result from db is : ",data);
+            // console.log(JSON.stringify(data));
+            res.status(200).json(data);
+        }
     });
 });
 
