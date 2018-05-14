@@ -1,12 +1,12 @@
 # serveurMachine
 
->git clone https://github.com/cygnauh/serveurMachine.git
+```git clone https://github.com/cygnauh/serveurMachine.git```
 
->cd serveurMachine
+```cd serveurMachine```
 
->npm install 
+```npm install ```
 
 to run the app
->node .
+```node .```
 
 ##Method
