@@ -52,13 +52,13 @@ app
 app.get('/', (req, res) => res.render('pages/index'))
 
 /*
-app.get('/', (req, res) => 
+app.get('/', (req, res) =>
         if(user != 'bddi' & password!='projetdelamour')
             res.redirect('/login')
 
         else
             res.render('pages/index')
-       
+
        )
 
 app.get('/login', (req, res) =>
@@ -67,11 +67,11 @@ app.get('/login', (req, res) =>
         else
             res.render('pages/login')
        )
-       
+
 app.get('/login/success', (req, res) =>
        if(req.body.user && req.body.user=='bddi')
             user = req.body.user
-        else    
+        else
             res.status(401)
 
         if(req.body.password && req.body.password=='projetdelamour')
@@ -254,13 +254,15 @@ app.post('/createStory', function(req, res){
     }).on('end', () => {
         body = Buffer.concat(body);
         let bodyJson = JSON.parse(body)
-        let title=bodyJson.title.toString()
-        let content=bodyJson.content.toString()
-        // at this point, `body` has the entire request body stored in it as a string
+        let _title=bodyJson.title.toString()
+        let _content=bodyJson.content.toString()
+
 
         //treat the ' in the string
-
+        var title = _title.replace(/'/g, "''");
+        var content = _content.replace(/'/g, "''");
         var sql = "INSERT INTO story (title, content) VALUES ('"+title+"', '"+content+"')";
+
         getHelper(sql, function(err,data){
             if (err) {
                 // error handling code goes here
@@ -275,8 +277,6 @@ app.post('/createStory', function(req, res){
 
     });
 });
-
-
 
 // ---- get every stories
 
