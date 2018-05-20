@@ -19,12 +19,15 @@ const password = ''
 //     database: "heroku_b716132ec2d76fe"
 // });
 
+
+// {multipleStatements: true}
 var con  = mysql.createPool({
     connectionLimit : 100,
     host: "us-cdbr-iron-east-04.cleardb.net",
     user: "b339e2448721c6",
     password: "efc16dbe",
-    database: "heroku_b716132ec2d76fe"
+    database: "heroku_b716132ec2d76fe",
+    multipleStatements: true
 });
 
 
@@ -261,13 +264,14 @@ app.post('/createStory', function(req, res){
         //treat the ' in the string
         var title = _title.replace(/'/g, "''");
         var content = _content.replace(/'/g, "''");
-        var sql = "INSERT INTO story (title, content) VALUES ('"+title+"', '"+content+"')";
+        var sql = "INSERT INTO story (title, content) VALUES ('"+title+"', '"+content+"'); SELECT LAST_INSERT_ID();";
 
         getHelper(sql, function(err,data){
             if (err) {
                 // error handling code goes here
                 console.log("ERROR : ",err);
             } else {
+                console.log(data)
                 console.log("1 record inserted");
                 res.status(200).json(data);
             }
