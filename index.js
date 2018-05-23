@@ -441,8 +441,9 @@ app.get('/storysoundsforreading', function (req, res) {
                             console.log("ERROR : ",err);
                         } else {
                             //stock background information
+                            console.log("data2")
+                            console.log(data2)
                             content.push({"base_sound" : data2})
-                            // res.status(200).json(content);
                         }
                     });
 
@@ -470,7 +471,18 @@ app.get('/storysoundsforreading', function (req, res) {
                         } else {
                             content.push({"sounds_added_url":data})
                             console.log(content)
-                            res.status(200).json(content);
+
+                            if(content.length === 3){
+                                console.log("ok")
+                                res.status(200).json(content);
+                            }else{
+                                setTimeout( () => {
+                                    if(content.length ===3){
+                                        res.status(200).json(content);
+                                    }
+                                }, 100)
+                            }
+
 
                         }
                     });
