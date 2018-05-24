@@ -409,89 +409,98 @@ app.get('/storysoundsforreading', function (req, res) {
 
     var story_id='';
 
+
+
     if(req.param('story')){
         story_id = req.param('story');
+        // get more information about the story
     }
 
-    //get more information about the story
+    if(story_id!==''){
+        console.log(story_id)
+        getHelper("SELECT * FROM story WHERE id ="+ story_id, function(err,data){
 
-    getHelper("SELECT * FROM story WHERE id ="+ story_id, function(err,data){
+            //id, title, content, author, base_sound, light, created_at
 
-        //id, title, content, author, base_sound, light, created_at
+            //what we will send back in the response
+            var content = []
+            var base_sound_id =data[0].base_sound
 
-        //what we will send back in the response
-        var content = []
-        var base_sound_id =data[0].base_sound
+            if (err) {
+                console.log("ERROR : ",err);
+            } else {
 
-        if (err) {
-            console.log("ERROR : ",err);
-        } else {
+                //get the others added sounds
+                getHelper("SELECT * FROM story_sounds WHERE story_id ="+ story_id, function(err,data1){
+                    if (err) {
+                        console.log("ERROR : ",err);
+                    } else {
 
-            //get the others added sounds
-            getHelper("SELECT * FROM story_sounds WHERE story_id ="+ story_id, function(err,data1){
-                if (err) {
-                    console.log("ERROR : ",err);
-                } else {
+                        content.push({"sounds_added":data1})
 
-                    content.push({"sounds_added":data1})
-
-                    //get the base sound data with the id
-                    getHelper("SELECT * FROM sound WHERE id  ="+ base_sound_id, function(err,data2){
-                        if (err) {
-                            console.log("ERROR : ",err);
-                        } else {
-                            //stock background information
-                            console.log("data2")
-                            console.log(data2)
-                            content.push({"base_sound" : data2})
-                        }
-                    });
-
-
-
-                    var id_sounds = []
-                    for(var i = 0; i<data1.length;i++){
-                        id_sounds.push(data1[i].sound_id)
-                    }
-
-                    console.log("data")
-                    console.log(data1)
-
-
-                    console.log("id_sounds")
-                    console.log(id_sounds)
-                    console.log("id_sounds.join()")
-                    console.log(id_sounds.join())
-
-                    //get sounds url
-                    getHelper("SELECT * FROM sound WHERE id in ("+ id_sounds+")", function(err,data){
-                        if (err) {
-                            // error handling code goes here
-                            console.log("ERROR : ",err);
-                        } else {
-                            content.push({"sounds_added_url":data})
-                            console.log(content)
-
-                            if(content.length === 3){
-                                console.log("ok")
-                                res.status(200).json(content);
-                            }else{
-                                setTimeout( () => {
-                                    if(content.length ===3){
-                                        res.status(200).json(content);
-                                    }
-                                }, 100)
+                        //get the base sound data with the id
+                        getHelper("SELECT * FROM sound WHERE id  ="+ base_sound_id, function(err,data2){
+                            if (err) {
+                                console.log("ERROR : ",err);
+                            } else {
+                                //stock background information
+                                console.log("data2")
+                                console.log(data2)
+                                content.push({"base_sound" : data2})
                             }
+                        });
 
 
+
+                        var id_sounds = []
+                        for(var i = 0; i<data1.length;i++){
+                            id_sounds.push(data1[i].sound_id)
                         }
-                    });
 
-                }
-            });
+                        console.log("data")
+                        console.log(data1)
 
-        }
-    });
+
+                        console.log("id_sounds")
+                        console.log(id_sounds)
+                        console.log("id_sounds.join()")
+                        console.log(id_sounds.join())
+
+                        //get sounds url
+                        getHelper("SELECT * FROM sound WHERE id in ("+ id_sounds+")", function(err,data){
+                            if (err) {
+                                // error handling code goes here
+                                console.log("ERROR : ",err);
+                            } else {
+                                content.push({"sounds_added_url":data})
+                                console.log(content)
+
+                                if(content.length === 3){
+                                    console.log("ok")
+                                    res.status(200).json(content);
+                                }else{
+                                    setTimeout( () => {
+                                        if(content.length ===3){
+                                            res.status(200).json(content);
+                                        }
+                                    }, 100)
+                                }
+
+
+                            }
+                        });
+
+                    }
+                });
+
+            }
+        });
+    }else{
+        res.status(400)
+    }
+
+
+
 });
 
 
