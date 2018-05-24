@@ -424,6 +424,7 @@ app.get('/storysoundsforreading', function (req, res) {
 
             //what we will send back in the response
             var content = []
+
             var base_sound_id =data[0].base_sound
 
             if (err) {
@@ -436,19 +437,9 @@ app.get('/storysoundsforreading', function (req, res) {
                         console.log("ERROR : ",err);
                     } else {
 
+                        //PUSH
                         content.push({"sounds_added":data1})
 
-                        //get the base sound data with the id
-                        getHelper("SELECT * FROM sound WHERE id  ="+ base_sound_id, function(err,data2){
-                            if (err) {
-                                console.log("ERROR : ",err);
-                            } else {
-                                //stock background information
-                                console.log("data2")
-                                console.log(data2)
-                                content.push({"base_sound" : data2})
-                            }
-                        });
 
 
 
@@ -472,19 +463,38 @@ app.get('/storysoundsforreading', function (req, res) {
                                 // error handling code goes here
                                 console.log("ERROR : ",err);
                             } else {
+
+                                //PUSH
                                 content.push({"sounds_added_url":data})
                                 console.log(content)
 
-                                if(content.length === 3){
-                                    console.log("ok")
-                                    res.status(200).json(content);
-                                }else{
-                                    setTimeout( () => {
-                                        if(content.length ===3){
+                                //get the base sound data with the id
+                                getHelper("SELECT * FROM sound WHERE id  ="+ base_sound_id, function(err,data2){
+                                    if (err) {
+                                        console.log("ERROR : ",err);
+                                    } else {
+                                        //stock background information
+                                        console.log("data2")
+                                        console.log(data2)
+
+                                        //PUSH
+                                        content.push({"base_sound" : data2})
+
+                                        if(content.length === 3){
+                                            console.log("ok")
                                             res.status(200).json(content);
+                                        }else{
+                                            setTimeout( () => {
+                                                if(content.length ===3){
+                                                    res.status(200).json(content);
+                                                }
+                                            }, 100)
                                         }
-                                    }, 100)
-                                }
+                                    }
+                                });
+
+
+
 
 
                             }
