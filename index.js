@@ -424,51 +424,55 @@ app.get('/storysoundsforreading', function (req, res) {
 
             //what we will send back in the response
             var content = []
-
-            var base_sound_id =data[0].base_sound
-
+            console.log("data")
+            console.log(data)
             if (err) {
                 console.log("ERROR : ",err);
-            } else {
+            } else if(data.length === 0){
 
+                console.log("empty array")
+                res.status(500).json('Something broke!');
+
+            } else {
+                console.log(data)
+
+                var base_sound_id =data[0].base_sound
                 //get the others added sounds
                 getHelper("SELECT * FROM story_sounds WHERE story_id ="+ story_id, function(err,data1){
                     if (err) {
                         console.log("ERROR : ",err);
+                    }
+
+                    else if(data1.length === 0){
+                        // console.log("empty array")
+                        // res.status(500).write('Something broke!');
+
                     } else {
 
                         //PUSH
                         content.push({"sounds_added":data1})
-
-
-
 
                         var id_sounds = []
                         for(var i = 0; i<data1.length;i++){
                             id_sounds.push(data1[i].sound_id)
                         }
 
-                        console.log("data")
-                        console.log(data1)
-
-
-                        console.log("id_sounds")
-                        console.log(id_sounds)
-                        console.log("id_sounds.join()")
-                        console.log(id_sounds.join())
-
-                        //get sounds url
+                        // get sounds url
                         getHelper("SELECT * FROM sound WHERE id in ("+ id_sounds+")", function(err,data){
                             if (err) {
                                 // error handling code goes here
                                 console.log("ERROR : ",err);
-                            } else {
+                            } else if(data.length === 0){
+
+                                // console.log("empty array")
+                                // res.status(500).write('Something broke!');
+
+                            }else {
 
                                 //PUSH
                                 content.push({"sounds_added_url":data})
-                                console.log(content)
 
-                                //get the base sound data with the id
+                                // get the base sound data with the id
                                 getHelper("SELECT * FROM sound WHERE id  ="+ base_sound_id, function(err,data2){
                                     if (err) {
                                         console.log("ERROR : ",err);
@@ -492,10 +496,6 @@ app.get('/storysoundsforreading', function (req, res) {
                                         }
                                     }
                                 });
-
-
-
-
 
                             }
                         });
