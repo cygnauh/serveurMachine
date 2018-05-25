@@ -424,8 +424,8 @@ app.get('/storysoundsforreading', function (req, res) {
 
             //what we will send back in the response
             var content = []
-            console.log("data")
-            console.log(data)
+            // console.log("data")
+            // console.log(data)
             if (err) {
                 console.log("ERROR : ",err);
             } else if(data.length === 0){
@@ -434,7 +434,8 @@ app.get('/storysoundsforreading', function (req, res) {
                 res.status(500).json('Something broke!');
 
             } else {
-                console.log(data)
+
+                // console.log(data[0].title)
 
                 var base_sound_id =data[0].base_sound
                 //get the others added sounds
@@ -450,6 +451,7 @@ app.get('/storysoundsforreading', function (req, res) {
                     } else {
 
                         //PUSH
+                        // content.push({"title":data[0].title})
                         content.push({"sounds_added":data1})
 
                         var id_sounds = []
@@ -478,14 +480,17 @@ app.get('/storysoundsforreading', function (req, res) {
                                         console.log("ERROR : ",err);
                                     } else {
                                         //stock background information
-                                        console.log("data2")
-                                        console.log(data2)
+                                        // console.log("data2")
+                                        // console.log(data2)
 
                                         //PUSH
                                         content.push({"base_sound" : data2})
 
+
                                         if(content.length === 3){
+
                                             console.log("ok")
+                                            console.log(content)
                                             res.status(200).json(content);
                                         }else{
                                             setTimeout( () => {
