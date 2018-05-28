@@ -257,10 +257,11 @@ app.post('/createStory', function(req, res){
     }).on('end', () => {
         body = Buffer.concat(body);
         let bodyJson = JSON.parse(body)
+
         let _title=bodyJson.title.toString()
         let _content=bodyJson.content.toString()
         let base_sound=bodyJson.base_sound
-        let light=bodyJson.light.toString()
+        let light = bodyJson.light.toString()
 
 
 
@@ -348,6 +349,7 @@ app.post('/createstorysound', function(req, res){
             if (err) {
                 // error handling code goes here
                 console.log("ERROR : ",err);
+                res.status(400).json(data);
             } else {
                 console.log("1 record inserted");
                 res.status(200).json(data);
@@ -418,14 +420,18 @@ app.get('/storysoundsforreading', function (req, res) {
 
     if(story_id!==''){
         console.log(story_id)
+
+        //FIRST STEP
+
+
         getHelper("SELECT * FROM story WHERE id ="+ story_id, function(err,data){
+            console.log("FIRST STEP")
+            console.log(data)
 
             //id, title, content, author, base_sound, light, created_at
 
             //what we will send back in the response
             var content = []
-            // console.log("data")
-            // console.log(data)
             if (err) {
                 console.log("ERROR : ",err);
             } else if(data.length === 0){
@@ -434,37 +440,46 @@ app.get('/storysoundsforreading', function (req, res) {
                 res.status(500).json('Something broke!');
 
             } else {
-
-                // console.log(data[0].title)
-
+                content.push({"title":data[0].title})
                 var base_sound_id =data[0].base_sound
+
                 //get the others added sounds
-                getHelper("SELECT * FROM story_sounds WHERE story_id ="+ story_id, function(err,data1){
+
+                getHelper("SELECT * FROM story_sounds WHERE story_id ="+ story_id, (err,data_other_sounds) => {
+
+                    //SECOND STEP
+                    console.log("SECOND STEP")
+                    console.log(data_other_sounds)
+
                     if (err) {
                         console.log("ERROR : ",err);
                     }
 
-                    else if(data1.length === 0){
+                    else if(data_other_sounds.length === 0){
+
                         // console.log("empty array")
-                        // res.status(500).write('Something broke!');
+                        res.status(500).write('Something broke!');
 
                     } else {
 
                         //PUSH
-                        // content.push({"title":data[0].title})
-                        content.push({"sounds_added":data1})
+                        content.push({"sounds_added":data_other_sounds})
 
                         var id_sounds = []
-                        for(var i = 0; i<data1.length;i++){
-                            id_sounds.push(data1[i].sound_id)
+                        for(var i = 0; i<data_other_sounds.length;i++){
+                            id_sounds.push(data_other_sounds[i].sound_id)
                         }
 
                         // get sounds url
-                        getHelper("SELECT * FROM sound WHERE id in ("+ id_sounds+")", function(err,data){
+                        getHelper("SELECT * FROM sound WHERE id in ("+ id_sounds+")", (err,data_url_sound) => {
+
+                            //THIRD STEP
+                            console.log("THIRD STEP")
+                            console.log(data_url_sound)
                             if (err) {
                                 // error handling code goes here
                                 console.log("ERROR : ",err);
-                            } else if(data.length === 0){
+                            } else if(data_url_sound.length === 0){
 
                                 // console.log("empty array")
                                 // res.status(500).write('Something broke!');
@@ -472,10 +487,18 @@ app.get('/storysoundsforreading', function (req, res) {
                             }else {
 
                                 //PUSH
-                                content.push({"sounds_added_url":data})
+                                content.push({"sounds_added_url":data_url_sound})
+
+                                console.log("base_sound_id")
+                                console.log(base_sound_id)
 
                                 // get the base sound data with the id
-                                getHelper("SELECT * FROM sound WHERE id  ="+ base_sound_id, function(err,data2){
+                                getHelper("SELECT * FROM sound WHERE id = "+ base_sound_id, (err,data_base_sound) => {
+
+                                    //FORTH STEP
+                                    console.log("FORTH STEP")
+                                    console.log(data_base_sound)
+
                                     if (err) {
                                         console.log("ERROR : ",err);
                                     } else {
@@ -483,14 +506,18 @@ app.get('/storysoundsforreading', function (req, res) {
                                         // console.log("data2")
                                         // console.log(data2)
 
+                                        console.log(data_base_sound, "databasesound")
                                         //PUSH
-                                        content.push({"base_sound" : data2})
+                                        content.push({"base_sound" : data_base_sound})
 
 
-                                        if(content.length === 3){
+                                        if(content.length === 4){
+                                            console.log("the title")
+                                            console.log(data[0].title)
 
                                             console.log("ok")
                                             console.log(content)
+
                                             res.status(200).json(content);
                                         }else{
                                             setTimeout( () => {
