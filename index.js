@@ -261,14 +261,28 @@ app.post('/createStory', function(req, res){
         let _title=bodyJson.title.toString()
         let _content=bodyJson.content.toString()
         let base_sound=bodyJson.base_sound
-        let light = bodyJson.light.toString()
+
+        // let light;
+        //
+        // light = bodyJson.light.toString()
+        //
+        // if(light){
+        //
+        // }else{
+        //     light = ""
+        // }
+        //
+        // // let light = JSON.stringify(bodyJson.light)
+        // console.log(typeof light)
+
+
 
 
 
         //treat the ' in the string
         var title = _title.replace(/'/g, "''");
         var content = _content.replace(/'/g, "''");
-        var sql = "INSERT INTO story (title, content, base_sound, light, created_at) VALUES ('"+title+"', '"+content+"', '"+base_sound+"', '"+light+"', NOW()); SELECT LAST_INSERT_ID();";
+        var sql = "INSERT INTO story (title, content, base_sound, created_at) VALUES ('"+title+"', '"+content+"', '"+base_sound+"', NOW()); SELECT LAST_INSERT_ID();";
 
         getHelper(sql, function(err,data){
             if (err) {
@@ -278,6 +292,7 @@ app.post('/createStory', function(req, res){
                 console.log(data)
                 console.log("1 record inserted");
                 res.status(200).json(data);
+                // res.status(200);
             }
         });
 
