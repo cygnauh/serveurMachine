@@ -314,6 +314,19 @@ app.get('/stories', function (req, res) {
     });
 });
 
+app.get('/laststory', function (req, res) {
+
+
+    getHelper('SELECT * FROM story ORDER BY id DESC LIMIT 1', function(err,data){
+        if (err) {
+            // error handling code goes here
+            console.log("ERROR : ",err);
+        } else {
+            res.status(200).json(data);
+        }
+    });
+});
+
 // ---- delete story
 
 app.delete('/deletestories', function (req, res) {
@@ -356,10 +369,9 @@ app.post('/createstorysound', function(req, res){
         let sound_id=bodyJson.soundId
         let addAtTime=bodyJson.addAtTime
 
-        // console.log(story_id)
         // at this point, `body` has the entire request body stored in it as a string
 
-        var sql = "INSERT INTO story_sounds (story_id, sound_id, time) VALUES ( '"+story_id+"', '"+sound_id+"','"+addAtTime+"' )";
+        var sql = "INSERT INTO story_sounds (story_id, sound_id, time) VALUES ( '"+story_id+"', '"+sound_id+"','"+addAtTime+"')";
         getHelper(sql, function(err,data){
             if (err) {
                 // error handling code goes here
@@ -495,9 +507,6 @@ app.get('/storysoundsforreading', function (req, res) {
                                 // error handling code goes here
                                 console.log("ERROR : ",err);
                             } else if(data_url_sound.length === 0){
-
-                                // console.log("empty array")
-                                // res.status(500).write('Something broke!');
 
                             }else {
 
