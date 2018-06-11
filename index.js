@@ -464,13 +464,13 @@ app.get('/storysoundsforreading', function (req, res) {
             } else if(data.length === 0){
 
                 console.log("empty array")
-                res.status(500).json('Something broke!');
+                res.status(500).json('Something broke! TWO');
 
             } else {
                 content.push({"title":data[0].title})
                 var base_sound_id =data[0].base_sound
 
-                //get the others added sounds
+                //get the others added sounds ids
 
                 getHelper("SELECT * FROM story_sounds WHERE story_id ="+ story_id, (err,data_other_sounds) => {
 
@@ -485,7 +485,13 @@ app.get('/storysoundsforreading', function (req, res) {
                     else if(data_other_sounds.length === 0){
 
                         // console.log("empty array")
-                        res.status(500).write('Something broke!');
+                        // res.status(500).write('Something broke HERE !');
+
+                        content.push({"sounds_added":[]})
+                        content.push({"sounds_added_url":[]})
+                        returnBaseSound(data, base_sound_id, content, res);
+
+                        // NO ADDED SOUNDS
 
                     } else {
 
@@ -507,6 +513,7 @@ app.get('/storysoundsforreading', function (req, res) {
                                 // error handling code goes here
                                 console.log("ERROR : ",err);
                             } else if(data_url_sound.length === 0){
+                                content.push({"sounds_added_url":[]})
 
                             }else {
 
@@ -516,42 +523,7 @@ app.get('/storysoundsforreading', function (req, res) {
                                 console.log("base_sound_id")
                                 console.log(base_sound_id)
 
-                                // get the base sound data with the id
-                                getHelper("SELECT * FROM sound WHERE id = "+ base_sound_id, (err,data_base_sound) => {
-
-                                    //FORTH STEP
-                                    console.log("FORTH STEP")
-                                    console.log(data_base_sound)
-
-                                    if (err) {
-                                        console.log("ERROR : ",err);
-                                    } else {
-                                        //stock background information
-                                        // console.log("data2")
-                                        // console.log(data2)
-
-                                        console.log(data_base_sound, "databasesound")
-                                        //PUSH
-                                        content.push({"base_sound" : data_base_sound})
-
-
-                                        if(content.length === 4){
-                                            console.log("the title")
-                                            console.log(data[0].title)
-
-                                            console.log("ok")
-                                            console.log(content)
-
-                                            res.status(200).json(content);
-                                        }else{
-                                            setTimeout( () => {
-                                                if(content.length ===3){
-                                                    res.status(200).json(content);
-                                                }
-                                            }, 100)
-                                        }
-                                    }
-                                });
+                                returnBaseSound(data, base_sound_id,content, res);
 
                             }
                         });
@@ -564,10 +536,46 @@ app.get('/storysoundsforreading', function (req, res) {
     }else{
         res.status(400)
     }
-
-
-
 });
+
+function returnBaseSound(data, base_sound_id, content, res){
+    // get the base sound data with the id
+    getHelper("SELECT * FROM sound WHERE id = "+ base_sound_id, (err,data_base_sound) => {
+
+        //FORTH STEP
+        console.log("FORTH STEP")
+        console.log(data_base_sound)
+
+        if (err) {
+            console.log("ERROR : ",err);
+        } else {
+            //stock background information
+            // console.log("data2")
+            // console.log(data2)
+
+            console.log(data_base_sound, "databasesound")
+            //PUSH
+            content.push({"base_sound" : data_base_sound})
+
+
+            if(content.length === 4){
+                console.log("the title")
+                console.log(data[0].title)
+
+                console.log("ok")
+                console.log(content)
+
+                res.status(200).json(content);
+            }else{
+                setTimeout( () => {
+                    if(content.length ===3){
+                        res.status(200).json(content);
+                    }
+                }, 100)
+            }
+        }
+    });
+}
 
 
 
